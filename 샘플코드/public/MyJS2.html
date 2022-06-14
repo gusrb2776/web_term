@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p>Click the button to display the date.</p>
+
+<button onclick="displayResponse()">The Response is</button>   <!--그냥 버튼 클릭을하면 날짜가 나오는 간단한 페이지임.-->
+
+<script>
+    //함수 새로 작성 및 이 함수안에 postman에서 복사한 코드 붙여넣으면 됨
+    function displayResponse(){
+        
+        var xhr = new XMLHttpRequest();     //html로 자바스크립트에 요청을 보내는 객체를 생성
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() {       //이벤트 리스너를 등록 및 상태가 바뀔때마다 실행될 함수 등록....
+        if(this.readyState === 4) {
+            //console.log(this.responseText); 이건 콘솔(브라우저 내 개발자도구 콘솔) 에 찍는거니까 이거 말고 밑에 코드로 바꾸면 됨.
+            document.getElementById("demo").innerHTML = this.responseText;
+        }
+        });
+        //요청 , get방식으로 한다는 뜻
+        xhr.open("GET", "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey=Vnrso4ayvW2S%252B26mo5JHOJpGzpXdp4H88RzhvTm0MoSVUKDszT5983m0mC0gkZ3ktiBKAyUYmzJjfzOU%252FP%252BK6Q%253D%253D&base_date=20220529&base_time=1600&nx=98&ny=77&dataType=JSON");
+        xhr.setRequestHeader("Cookie", "JSESSIONID=kawSMKhmVC7bmq2EyvBuqcp8z3luUC5TSWVKyVymjI2TUMcl7bx6wz56hsWc88Az.amV1c19kb21haW4vbmV3c2t5Mw==");
+        
+        //실질적으로 요청을 보내는것
+        xhr.send();
+        /*
+        아마 눌러도 아무것도 안뜰꺼야 -> f12를 누르고 개발자 도구를 들어가 에러를 보자. 
+        CORS 정책때문에 막혔다. 이건 뭘까용?
+        이제 설명할꺼야
+
+        자바스크립트에서 즉 클라이언트 딴에서 다른 웹페이지에 요청을 보낼때 같은 출처의 페이지에만 접근이 가능하다는것
+        예외적으로 보낼 수 있는 조건이 있는데 그 정책이 CORS 정책임. 다르다고 무조건 막는게 아닌 CORS에 적합한지 확인하고 막음.
+
+        사용하는 방법.
+        Node JS에서의 호출을 하면됨. 클라이언트 딴에서 요청하는게 아닌 서버딴에서 요청을 하면 되는거니까!!
+        클라이언트가 서버에 요청을하고 서버가 open api에 요청을 해서 받은걸 서버에 서버에서 다시 클라이언트에 주면 됨.
+
+        index3.js로 가자
+        */
+    }
+</script>
+
+<p id="demo"></p>
+
+</body>
+</html> 
+
+
+
