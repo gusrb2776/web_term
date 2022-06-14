@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p>Click the button to display the date.</p>
+
+<button onclick="displayResponse()">The Response is</button>
+
+<script>
+    function displayResponse(){
+        var xhr = new XMLHttpRequest(); 
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() { 
+        if(this.readyState === 4) {
+            document.getElementById("demo").innerHTML = this.responseText;
+        }
+        });
+
+        // 요청을 localhost:3000/webapi에 보내면 됨! 그러니까 node js에 보낸다는 뜻
+        xhr.open("GET", "http://localhost:3000/webapi"); //이걸 수정하면 된다는 말.    
+        xhr.send();
+        //static파일이니 서버 다시 실행할 필요없이 하면 됨. (서버파일을 건든게 아니니까!)
+    }
+</script>
+
+<p id="demo"></p>
+
+</body>
+</html> 
+
+
+

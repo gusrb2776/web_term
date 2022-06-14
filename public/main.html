@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script type='text/javascript' defer src="weather.js"></script>
+    <link rel="stylesheet" type='text/css' href="paint.css">
+    <title>Web_term_이현규</title>
+</head>
+<body>
+    <!--header,nav,footer 사용완료-->
+    <header>
+        <h2>선택된 지역의 날씨에 따른 책 추천 및 검색</h2>
+    </header>
+    <nav>
+        <div>open api 이용 사이트</div>
+        <a href="https://www.data.go.kr/index.do" target="_blank">공공데이터포털</a>
+        <a href="https://developers.kakao.com/" target="_self">카카오 Developers</a>
+    </nav>
+    <section id="section1">
+        <p><em>지역선택(클릭하세요)</em></p> 
+        <div id="map"></div>
+        <div id="clickLatlng"></div>
+        <input type="text" class='hide' name='nx' value='98'>       <!-- input의 text   1개-->
+        <input type="text" class='hide' name='ny' value='77'>
+
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=7a694b7f41a1b6ff5861fd0e1f66b984"></script>
+        <script>
+            //지도 생성
+            var mapContainer = document.getElementById('map'),
+                mapOption = { 
+                    center: new kakao.maps.LatLng(35.232986749979545, 129.08449610239884),
+                    level: 7 // 지도의 확대 레벨
+                };
+            var map = new kakao.maps.Map(mapContainer, mapOption);
+            
+            // 마커생성
+            var marker = new kakao.maps.Marker({ 
+                position: map.getCenter() 
+            }); 
+            marker.setMap(map);
+
+            // 클릭이벤트 등록(콜백함수)
+            kakao.maps.event.addListener(map, 'click', function(mouseEvent) {        
+                var latlng = mouseEvent.latLng; //클릭위치 정보(위도,경도) 가져오기
+                marker.setPosition(latlng); //클릭위치로 마커 이동
+                
+                var lat = latlng.getLat();  //위도
+                var lng = latlng.getLng();  //경도
+
+                var rs = dfs_xy_conv(lat, lng); //변환
+
+                document.getElementsByClassName("hide")[0].value = rs.x;
+                document.getElementsByClassName("hide")[1].value = rs.y;
+            });
+
+            //위도 경도(toLL) <--> 격자좌표(toXY)
+            var RE = 6371.00877; // 지구 반경(km)
+            var GRID = 5.0; // 격자 간격(km)
+            var SLAT1 = 30.0; // 투영 위도1(degree)
+            var SLAT2 = 60.0; // 투영 위도2(degree)
+            var OLON = 126.0; // 기준점 경도(degree)
+            var OLAT = 38.0; // 기준점 위도(degree)
+            var XO = 43; // 기준점 X좌표(GRID)
+            var YO = 136; // 기1준점 Y좌표(GRID)
+            function dfs_xy_conv(v1, v2) {
+                var DEGRAD = Math.PI / 180.0;
+                var RADDEG = 180.0 / Math.PI;
+                
+                var re = RE / GRID;
+                var slat1 = SLAT1 * DEGRAD;
+                var slat2 = SLAT2 * DEGRAD;
+                var olon = OLON * DEGRAD;
+                var olat = OLAT * DEGRAD;
+                
+                var sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+                sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+                var sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+                sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+                var ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+                ro = re * sf / Math.pow(ro, sn);
+                var rs = {};
+                rs['lat'] = v1;
+                rs['lng'] = v2;
+                var ra = Math.tan(Math.PI * 0.25 + (v1) * DEGRAD * 0.5);
+                ra = re * sf / Math.pow(ra, sn);
+                var theta = v2 * DEGRAD - olon;
+                if (theta > Math.PI) theta -= 2.0 * Math.PI;
+                if (theta < -Math.PI) theta += 2.0 * Math.PI;
+                theta *= sn;
+                rs['x'] = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+                rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);                
+                return rs;
+            }
+        </script>
+    </section>
+    <section id="section2">
+        <button onclick="displayResponse()">날씨확인</button><br>
+        <div><em>해당지역의 금일<span id="today_date"></span> 날씨</em></div>
+        <ul>                                    <!-- list나 table중 list 사용완료.-->
+            <li>하늘 : 
+                <span id="sky"></span>
+            </li>
+            <li>비 : 
+                <span id="rain"></span>
+            </li>
+            <li>기온 : 
+                <span id="temp"></span>
+            </li>
+        </ul>
+        <script>
+            var today = new Date();
+            var base_date = today.toISOString().substring(0,10).replace(/-/g,'');
+
+            document.getElementById("today_date").innerHTML = "( " + base_date + " )";
+        </script>
+    </section>
+    <section id="section3">
+        <label for="bookName">책 이름:</label>
+        <input type="search" id="bookName" name="bookName">                 <!-- input의 search     2개-->
+        <input type="button" id="search" value="책 검색하기"></button>      <!-- input의 button     3개. 사용완료-->
+
+        <div id="book"></div>
+        <script src="https://code.jquery.com/jquery-3.4.1.js"
+            integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+        <script>
+            $(document).ready(function () {
+                $("#search").click(function () {
+                    $.ajax({
+                        method: "GET",
+                        url: "https://dapi.kakao.com/v3/search/book?target=title",
+                        data: { query: $("#bookName").val() },
+                        headers: { Authorization: "KakaoAK b6c9212e975a77038d59fdfdbf209d1f" }
+                    })
+                        .done(function (msg) {
+                            $("#book").text('');        //매 클릭마다 초기화 해주기
+                            $("#book").append("<span id='name'>" + msg.documents[0].title + "</span>");
+                            $("#book").append("<img src='" + msg.documents[0].thumbnail + "' alt='사진이 없습니다.'/>");
+                        });
+                });
+            });
+        </script>    
+    </section>
+    <footer>
+        &copy;이현규 Leehyunkyu 부산광역시 금정구
+    </footer>
+</body>
+</html>

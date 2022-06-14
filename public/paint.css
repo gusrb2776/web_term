@@ -1,0 +1,107 @@
+@media screen and (max-width:900px) {
+    #section3{                          /*section1,2는 %로 설정을 이미 해놔서 section3만 media로 따로 설정*/
+        width:100%;
+    }
+}
+
+.hide {
+    display:None;
+}
+
+body{
+    background-color: rgb(166, 214, 166);
+    margin : 0px;
+}
+
+header{
+    background-color :rgb(97, 186, 158);
+    padding : 20px;
+}
+
+header h2{                  /*combinator 1개*/
+    text-align: center;
+    color : white;
+}
+
+nav{
+    text-align:center;
+    text-decoration: dashed;
+    border:1px solid black;
+}
+
+nav > div {                 /*combinator 2개*/
+    font-weight: bold;
+}
+a[target]:link {            /*attribute 속성 1개 , Pseudo-class 1개*/
+    color : rgb(29, 74, 50);
+}
+
+a[target]:visited{          /*Pseudo-class 2개 사용완료.*/
+    color : rgb(123, 128, 205);
+}
+
+#section1 > p {               /*combinator 3개*/
+    margin : 5px;
+    text-align: left;
+    font-weight: bold;
+    color : rgb(26, 83, 87);
+}
+
+p + div{                    /*combinator 4개*/
+    width:50%;
+    height:400px;
+    border:solid 1px black;
+    float:left;
+}
+
+#section2 {
+    float:right;
+    width:49%;
+    height:410px;
+}
+
+#section2 > button{         /*combinator 5개 사용완료.*/
+    width:100%;
+    margin-bottom: 20px;
+}
+
+#section2 > div{
+    width:100%;
+    font-size:20px;
+}
+
+#section2 > ul li{
+    margin-top : 30px;
+}
+
+#section3{
+    clear:left;
+    clear:right;
+}
+
+label[for="bookName"]{
+    font-weight:bold;
+}
+
+#book #name::selection{     /*pseudo-element 1개*/
+    color : red;
+    background-color : rgb(178, 245, 188);
+}
+
+[alt]{                      /*attribute 2개 사용완료.*/     /*책 그림 표시 줄 띄우기*/
+    margin-top:10px;
+}
+
+
+
+footer{
+    text-align: center;
+    padding :10px;
+    margin-top: 70px;
+    border-top : 1px black solid;
+    color : whitesmoke;
+}
+
+footer::first-letter{       /*Pseudo-element 2개 사용완료.*/
+    font-weight: bold;
+}
